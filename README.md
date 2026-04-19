@@ -62,3 +62,54 @@ curl.exe -I -H "Host: bulletin.local" http://158.160.239.126
 yc alb load-balancer get devops-lvl2-alb --format yaml
 curl.exe -I http://81.26.178.245
 ```
+
+## Task 2: Domain And DNS
+
+Зарегистрирован домен `hexlet-tutorial.ru`.
+
+В Yandex Cloud создана публичная DNS-зона:
+
+- Zone name: `hexlet-tutorial-ru`
+- Domain: `hexlet-tutorial.ru`
+
+NS-серверы для делегирования у регистратора:
+
+- `ns1.yandexcloud.net`
+- `ns2.yandexcloud.net`
+
+Добавлены DNS-записи:
+
+- `hexlet-tutorial.ru -> 81.26.178.245`
+- `www.hexlet-tutorial.ru -> 81.26.178.245`
+
+## What To Do In REG.RU
+
+У регистратора нужно заменить NS домена на:
+
+```text
+ns1.yandexcloud.net
+ns2.yandexcloud.net
+```
+
+После делегирования обновление DNS может занять от нескольких часов до суток.
+
+## How To Check Domain
+
+Проверка NS:
+
+```powershell
+nslookup -type=NS hexlet-tutorial.ru 8.8.8.8
+```
+
+Проверка A-записи:
+
+```powershell
+nslookup hexlet-tutorial.ru 8.8.8.8
+```
+
+Проверка HTTP:
+
+```powershell
+curl.exe -I http://hexlet-tutorial.ru
+curl.exe -I http://www.hexlet-tutorial.ru
+```
