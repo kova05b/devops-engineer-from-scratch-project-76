@@ -113,3 +113,65 @@ nslookup hexlet-tutorial.ru 8.8.8.8
 curl.exe -I http://hexlet-tutorial.ru
 curl.exe -I http://www.hexlet-tutorial.ru
 ```
+
+## Task 3: Prepare Servers For Deploy
+
+Для подготовки серверов добавлены:
+
+- `inventory.ini`
+- `playbook.yml`
+- `requirements.yml`
+- `group_vars/all.yml`
+- `group_vars/webservers.yml`
+- `Makefile`
+
+Группа серверов в inventory:
+
+- `web1 -> 111.88.248.195`
+- `web2 -> 62.84.114.155`
+
+Ansible использует роли из Ansible Galaxy:
+
+- `geerlingguy.pip`
+- `geerlingguy.docker`
+
+И коллекцию:
+
+- `community.docker`
+
+## How To Run Ansible
+
+Перед запуском `make prepare` нужен рабочий SSH-доступ к серверам для пользователя `kazgrmruslan`.
+В этом проекте подготовка выполнялась с ключом `~/.ssh/id_ed25519`, который был добавлен в metadata обеих ВМ.
+
+Установка ролей и коллекций:
+
+```bash
+make install
+```
+
+Локальная проверка inventory и синтаксиса плейбука:
+
+```bash
+make check
+```
+
+Подготовка серверов:
+
+```bash
+make prepare
+```
+
+Что делает плейбук:
+
+- устанавливает `pip`
+- устанавливает Python-модуль `docker`
+- устанавливает Docker на сервера из группы `webservers`
+
+Проверка после подготовки:
+
+```bash
+ansible all -i inventory.ini -m ping
+ansible all -i inventory.ini -a "docker --version"
+ansible all -i inventory.ini -a 'python3 -c "import docker; print(docker.__version__)"'
+```
