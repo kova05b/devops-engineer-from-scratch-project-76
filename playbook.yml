@@ -3,6 +3,16 @@
   become: true
   serial: 1
 
+  pre_tasks:
+    - name: Ensure Ubuntu universe repository is enabled
+      ansible.builtin.apt_repository:
+        repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
+        state: present
+        update_cache: true
+      when: ansible_distribution == "Ubuntu"
+      tags:
+        - prepare
+
   roles:
     - role: geerlingguy.pip
       tags:
@@ -11,7 +21,7 @@
       tags:
         - prepare
     - role: datadog.datadog
-      when: inventory_hostname in groups['webservers']
+      when: inventory_hostname in groups.get('webservers', [])
       tags:
         - monitoring
 
