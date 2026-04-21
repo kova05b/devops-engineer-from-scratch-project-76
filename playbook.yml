@@ -5,10 +5,10 @@
 
   pre_tasks:
     - name: Ensure Ubuntu universe repository is enabled
-      ansible.builtin.apt_repository:
-        repo: universe
-        state: present
-        update_cache: true
+      ansible.builtin.command:
+        cmd: add-apt-repository -y universe
+      register: ubuntu_universe_result
+      changed_when: "'is already enabled' not in ubuntu_universe_result.stdout | lower"
       when: ansible_facts["distribution"] == "Ubuntu"
       tags:
         - prepare
