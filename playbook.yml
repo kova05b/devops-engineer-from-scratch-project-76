@@ -10,6 +10,10 @@
     - role: geerlingguy.docker
       tags:
         - prepare
+    - role: datadog.datadog
+      when: inventory_hostname in groups['webservers']
+      tags:
+        - monitoring
 
   tasks:
     - name: Ensure Redmine app directory exists

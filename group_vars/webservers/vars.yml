@@ -17,3 +17,17 @@ redmine_db_name: redmine
 redmine_db_user: redmine
 redmine_db_password: "{{ vault_redmine_db_password }}"
 redmine_secret_key_base: "{{ vault_redmine_secret_key_base }}"
+
+datadog_api_key: "{{ vault_datadog_api_key }}"
+datadog_site: datadoghq.eu
+datadog_checks:
+  http_check:
+    init_config:
+    instances:
+      - name: redmine_local
+        url: "http://127.0.0.1:{{ redmine_port }}"
+        timeout: 5
+        collect_response_time: true
+        tags:
+          - service:redmine
+          - project:devops-project-76

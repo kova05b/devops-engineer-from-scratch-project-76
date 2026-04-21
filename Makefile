@@ -1,4 +1,4 @@
-.PHONY: install check prepare deploy vault-view vault-edit
+.PHONY: install check prepare deploy monitor vault-view vault-edit
 
 VAULT_PASSWORD_FILE ?= $(HOME)/.ansible/devops-project-76.vault-pass
 
@@ -16,6 +16,10 @@ prepare:
 deploy:
 	ansible-galaxy install -r requirements.yml
 	ansible-playbook -i inventory.ini playbook.yml --tags deploy --vault-password-file $(VAULT_PASSWORD_FILE)
+
+monitor:
+	ansible-galaxy install -r requirements.yml
+	ansible-playbook -i inventory.ini playbook.yml --tags monitoring --vault-password-file $(VAULT_PASSWORD_FILE)
 
 vault-view:
 	ansible-vault view group_vars/webservers/vault.yml --vault-password-file $(VAULT_PASSWORD_FILE)

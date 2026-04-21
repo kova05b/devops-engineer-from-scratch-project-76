@@ -63,6 +63,12 @@ make prepare
 make deploy
 ```
 
+Установка DataDog Agent:
+
+```bash
+make monitor
+```
+
 Редактирование секретов:
 
 ```bash
@@ -78,9 +84,11 @@ make vault-edit
 - домен `hexlet-tutorial.ru`
 - PostgreSQL host `rc1a-2um369d35ms7bgbf.mdb.yandexcloud.net`
 - PostgreSQL port `6432`
+- `DD_SITE=datadoghq.eu`
 
 `.env` для контейнера создаётся из шаблона `templates/redmine.env.j2`.
 Секреты хранятся в `group_vars/webservers/vault.yml` и зашифрованы через `Ansible Vault`.
+Для мониторинга используется роль `datadog.datadog` и `http_check` к `http://127.0.0.1:80` на обоих серверах.
 
 ## Checks
 
@@ -99,6 +107,13 @@ ansible all -i inventory.ini -m ping
 ansible all -i inventory.ini -a "docker --version"
 curl.exe -I http://111.88.248.195
 curl.exe -I http://62.84.114.155
+```
+
+Проверка мониторинга:
+
+```bash
+ansible webservers -i inventory.ini -b -a "systemctl status datadog-agent --no-pager"
+ansible webservers -i inventory.ini -b -a "test -f /etc/datadog-agent/conf.d/http_check.d/conf.yaml && echo ok"
 ```
 
 Проверка балансировщика:
