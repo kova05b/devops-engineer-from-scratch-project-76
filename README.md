@@ -32,7 +32,8 @@ Redmine задеплоен в Yandex Cloud на 2 сервера за `Applicati
 - `playbook.yml`
 - `requirements.yml`
 - `group_vars/all.yml`
-- `group_vars/webservers.yml`
+- `group_vars/webservers/vars.yml`
+- `group_vars/webservers/vault.yml`
 - `templates/redmine.env.j2`
 - `Makefile`
 
@@ -62,6 +63,12 @@ make prepare
 make deploy
 ```
 
+Редактирование секретов:
+
+```bash
+make vault-edit
+```
+
 ## Variables
 
 Используются основные переменные:
@@ -73,6 +80,7 @@ make deploy
 - PostgreSQL port `6432`
 
 `.env` для контейнера создаётся из шаблона `templates/redmine.env.j2`.
+Секреты хранятся в `group_vars/webservers/vault.yml` и зашифрованы через `Ansible Vault`.
 
 ## Checks
 
