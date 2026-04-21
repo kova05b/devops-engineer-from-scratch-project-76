@@ -37,6 +37,17 @@ Redmine задеплоен в Yandex Cloud на 2 сервера за `Applicati
 - `templates/redmine.env.j2`
 - `Makefile`
 
+## System Requirements
+
+Для запуска проекта нужны:
+
+- `WSL` или Linux-окружение
+- `Ansible`
+- `make`
+- `Python 3`
+- SSH-доступ к серверам из `inventory.ini`
+- файл пароля для `Ansible Vault` вне репозитория
+
 ## Setup
 
 Установка зависимостей:
