@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Prepare hosts, deploy Redmine, and configure monitoring
+  hosts: all
   become: true
   serial: 1
 
@@ -46,6 +47,7 @@
         - name: Pull Redmine image
           ansible.builtin.command:
             cmd: "docker pull {{ redmine_image }}"
+          changed_when: false
 
         - name: Remove existing Redmine container if present
           ansible.builtin.command:
@@ -64,6 +66,7 @@
               -p {{ redmine_port }}:3000
               -v redmine_files:/usr/src/redmine/files
               {{ redmine_image }}
+          changed_when: false
 
         - name: Wait for Redmine port to become available
           ansible.builtin.wait_for:
