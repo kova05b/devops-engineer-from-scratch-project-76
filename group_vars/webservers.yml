@@ -4,3 +4,16 @@ pip_install_packages:
 
 docker_users:
   - kazgrmruslan
+
+redmine_image: redmine:latest
+redmine_container_name: redmine
+redmine_app_path: /opt/redmine
+redmine_port: 80
+
+redmine_domain: hexlet-tutorial.ru
+redmine_db_host: rc1a-2um369d35ms7bgbf.mdb.yandexcloud.net
+redmine_db_port: 6432
+redmine_db_name: redmine
+redmine_db_user: redmine
+redmine_db_password: "RedmineDbPass123!"
+redmine_secret_key_base: "3e6f0bf24e9243cdb1716683eec3d4adfc713d8aa33891b45451b6f0f6d412f7"

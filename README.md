@@ -1,156 +1,50 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/kova05b/devops-engineer-from-scratch-project-76/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kova05b/devops-engineer-from-scratch-project-76/actions)
 
-## Task 1: Infrastructure Preparation
+## Project
 
-Проект для задания собран с максимальным переиспользованием уже существующей инфраструктуры в Yandex Cloud.
+Redmine задеплоен в Yandex Cloud на 2 сервера за `Application Load Balancer`.
 
-## What Is Reused
+Рабочие адреса:
 
-- Network: `project-devops-deploy-net`
-- Subnet: `project-devops-deploy-subnet` (`10.10.0.0/24`)
-- Two running servers:
-  - `cl1nrh6jtcissullua9l-ebeh` (`10.10.0.30`)
-  - `cl1nrh6jtcissullua9l-uzur` (`10.10.0.35`)
-- PostgreSQL cluster: `project-devops-deploy-pg`
+- [http://hexlet-tutorial.ru](http://hexlet-tutorial.ru)
+- [https://hexlet-tutorial.ru](https://hexlet-tutorial.ru)
+- [http://www.hexlet-tutorial.ru](http://www.hexlet-tutorial.ru)
+- [https://www.hexlet-tutorial.ru](https://www.hexlet-tutorial.ru)
 
-## What Was Created For The Task
+## Infrastructure
 
-- Security group for ALB: `devops-lvl2-alb-sg`
-- Target group: `devops-lvl2-tg`
-- Backend group: `devops-lvl2-bg`
-- HTTP router: `devops-lvl2-router-default`
-- Application Load Balancer: `devops-lvl2-alb`
+Используются:
 
-Дополнительно ограничен доступ к PostgreSQL: убраны публичные правила `0.0.0.0/0`, оставлен доступ только из внутренней сети и с серверов кластера.
+- 2 сервера:
+  - `111.88.248.195`
+  - `62.84.114.155`
+- `Application Load Balancer` с IP `81.26.178.245`
+- `Managed PostgreSQL`
+- публичная DNS-зона для `hexlet-tutorial.ru`
+- managed certificate в Yandex Certificate Manager
 
-## URL
+## Project Files
 
-- Existing ingress IP: `http://158.160.239.126`
-- ALB URL: `http://81.26.178.245`
-
-Важно: текущее приложение за ingress отвечает на запросы с `Host: bulletin.local`, поэтому в ALB настроен `host rewrite` на `bulletin.local`.
-
-## How To Check
-
-Проверка ресурсов:
-
-```powershell
-yc compute instance list --folder-id b1gm6c5s7u190o7dg55s
-yc managed-postgresql cluster list --folder-id b1gm6c5s7u190o7dg55s
-yc alb load-balancer list --folder-id b1gm6c5s7u190o7dg55s
-```
-
-Проверка Kubernetes-приложения:
-
-```powershell
-yc managed-kubernetes cluster get-credentials --id catn45aml6o03r8mjomv --external --force
-kubectl get nodes -o wide
-kubectl get svc -A
-kubectl get ingress -A
-```
-
-Проверка доступности приложения:
-
-```powershell
-curl.exe -I -H "Host: bulletin.local" http://158.160.239.126
-```
-
-Проверка нового ALB:
-
-```powershell
-yc alb load-balancer get devops-lvl2-alb --format yaml
-curl.exe -I http://81.26.178.245
-```
-
-## Task 2: Domain And DNS
-
-Зарегистрирован домен `hexlet-tutorial.ru`.
-
-В Yandex Cloud создана публичная DNS-зона:
-
-- Zone name: `hexlet-tutorial-ru`
-- Domain: `hexlet-tutorial.ru`
-
-NS-серверы для делегирования у регистратора:
-
-- `ns1.yandexcloud.net`
-- `ns2.yandexcloud.net`
-
-Добавлены DNS-записи:
-
-- `hexlet-tutorial.ru -> 81.26.178.245`
-- `www.hexlet-tutorial.ru -> 81.26.178.245`
-
-## What To Do In REG.RU
-
-У регистратора нужно заменить NS домена на:
-
-```text
-ns1.yandexcloud.net
-ns2.yandexcloud.net
-```
-
-После делегирования обновление DNS может занять от нескольких часов до суток.
-
-## How To Check Domain
-
-Проверка NS:
-
-```powershell
-nslookup -type=NS hexlet-tutorial.ru 8.8.8.8
-```
-
-Проверка A-записи:
-
-```powershell
-nslookup hexlet-tutorial.ru 8.8.8.8
-```
-
-Проверка HTTP:
-
-```powershell
-curl.exe -I http://hexlet-tutorial.ru
-curl.exe -I http://www.hexlet-tutorial.ru
-```
-
-## Task 3: Prepare Servers For Deploy
-
-Для подготовки серверов добавлены:
+Основные файлы проекта:
 
 - `inventory.ini`
 - `playbook.yml`
 - `requirements.yml`
 - `group_vars/all.yml`
 - `group_vars/webservers.yml`
+- `templates/redmine.env.j2`
 - `Makefile`
 
-Группа серверов в inventory:
+## Setup
 
-- `web1 -> 111.88.248.195`
-- `web2 -> 62.84.114.155`
-
-Ansible использует роли из Ansible Galaxy:
-
-- `geerlingguy.pip`
-- `geerlingguy.docker`
-
-И коллекцию:
-
-- `community.docker`
-
-## How To Run Ansible
-
-Перед запуском `make prepare` нужен рабочий SSH-доступ к серверам для пользователя `kazgrmruslan`.
-В этом проекте подготовка выполнялась с ключом `~/.ssh/id_ed25519`, который был добавлен в metadata обеих ВМ.
-
-Установка ролей и коллекций:
+Установка зависимостей:
 
 ```bash
 make install
 ```
 
-Локальная проверка inventory и синтаксиса плейбука:
+Проверка inventory и синтаксиса плейбука:
 
 ```bash
 make check
@@ -162,16 +56,47 @@ make check
 make prepare
 ```
 
-Что делает плейбук:
+Деплой Redmine:
 
-- устанавливает `pip`
-- устанавливает Python-модуль `docker`
-- устанавливает Docker на сервера из группы `webservers`
+```bash
+make deploy
+```
 
-Проверка после подготовки:
+## Variables
+
+Используются основные переменные:
+
+- `redmine_port=80`
+- образ `redmine:latest`
+- домен `hexlet-tutorial.ru`
+- PostgreSQL host `rc1a-2um369d35ms7bgbf.mdb.yandexcloud.net`
+- PostgreSQL port `6432`
+
+`.env` для контейнера создаётся из шаблона `templates/redmine.env.j2`.
+
+## Checks
+
+Проверка домена:
+
+```powershell
+nslookup hexlet-tutorial.ru 8.8.8.8
+curl.exe -I http://hexlet-tutorial.ru
+curl.exe -I https://hexlet-tutorial.ru
+```
+
+Проверка серверов:
 
 ```bash
 ansible all -i inventory.ini -m ping
 ansible all -i inventory.ini -a "docker --version"
-ansible all -i inventory.ini -a 'python3 -c "import docker; print(docker.__version__)"'
+curl.exe -I http://111.88.248.195
+curl.exe -I http://62.84.114.155
+```
+
+Проверка балансировщика:
+
+```powershell
+yc alb load-balancer get devops-lvl2-alb --format yaml
+curl.exe -I http://81.26.178.245
+curl.exe -I https://81.26.178.245
 ```

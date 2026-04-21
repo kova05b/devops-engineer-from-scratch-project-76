@@ -1,4 +1,4 @@
-.PHONY: install check prepare
+.PHONY: install check prepare deploy
 
 install:
 	ansible-galaxy install -r requirements.yml
@@ -9,4 +9,8 @@ check:
 
 prepare:
 	ansible-galaxy install -r requirements.yml
-	ansible-playbook -i inventory.ini playbook.yml
+	ansible-playbook -i inventory.ini playbook.yml --tags prepare
+
+deploy:
+	ansible-galaxy install -r requirements.yml
+	ansible-playbook -i inventory.ini playbook.yml --tags deploy
